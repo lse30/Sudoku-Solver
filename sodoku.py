@@ -1,4 +1,76 @@
-def main():
+from tkinter import *
+from tkinter.ttk import *
+
+
+
+
+
+class SudokuGui:
+    """Sudoku Gui for sudoku solver"""
+
+    def __init__(self, window):
+        """sets up the window"""
+
+        self.title = Label(window, text="Sudoku Solver")
+        self.title.grid(row=0, column=1, pady=10, columnspan = 9)
+
+        self.left_edge = Label(window, text=" ")
+        self.left_edge.grid(row=0, column=0, pady=0)
+
+        self.right_edge = Label(window, text=" ")
+        self.right_edge.grid(row=0, column=10, pady=0)
+
+        self.entry_dict = {}
+        i = 1
+        j = 1
+        while j < 10:
+            while i < 10:
+                if i in [3,6] and j in [3,6]:
+                    self.entry = Entry(window, width=3)
+                    self.entry.grid(row=j, column=i, padx=(0,3), pady=(0,3))
+                    k = (j*10) + i
+                    self.entry_dict[k] = self.entry
+                    i += 1
+                elif i in [3,6] and j not in [3,6]:
+                    self.entry = Entry(window, width=3)
+                    self.entry.grid(row=j, column=i, padx=(0, 3))
+                    k = (j * 10) + i
+                    self.entry_dict[k] = self.entry
+                    i += 1
+                elif i not in [3,6] and j in [3,6]:
+                    self.entry = Entry(window, width=3)
+                    self.entry.grid(row=j, column=i, pady=(0, 3))
+                    k = (j * 10) + i
+                    self.entry_dict[k] = self.entry
+                    i += 1
+                else:
+                    self.entry = Entry(window, width=3)
+                    self.entry.grid(row=j, column=i)
+                    k = (j * 10) + i
+                    self.entry_dict[k] = self.entry
+                    i += 1
+
+            j += 1
+            i = 1
+
+
+        self.calc = Button(window, text="Calculate", command=self.print_dict)
+        self.calc.grid(row=10, column=1, columnspan = 9, pady=10)
+
+    def print_dict(self):
+        """dfsdfsdfsd sdfsd"""
+        sudoku_dict = {}
+        for key in self.entry_dict:
+            output = self.entry_dict[key]
+            new = output.get()
+            if new == '':
+                sudoku_dict[key] = {1, 2, 3, 4, 5, 6, 7, 8, 9}
+            else:
+                sudoku_dict[key] = int(new)
+        solver(sudoku_dict)
+
+
+def solver(sudoku_dict):
     """Basic sudoku solver Version 1"""
     #input_sodoku()
 
@@ -11,18 +83,20 @@ def main():
                       7 : {71, 72, 73, 81, 82, 83, 91, 92, 93},
                       8 : {74, 75, 76, 84, 85, 86, 94, 95, 96},
                       9 : {77, 78, 79, 87, 88, 89, 97, 98, 99}}
-    sudoku = given_sudoku()
+    sudoku = sudoku_dict
     sudoku_updated = True
     while sudoku_updated:
+        sudoku = check_rows(sudoku)
         sudoku = check_cols(sudoku)
         boxes = get_boxes(sudoku, box_index_dict)
         sudoku = check_boxes(sudoku, boxes, box_index_dict)
         sudoku, sudoku_updated = set_length_one(sudoku)
-        sudoku = check_rows(sudoku)
+
 
     print_sudoku(sudoku)
 
-def input_sodoku():
+
+def input_sudoku():
     """For a user inputted sudoku
     creates a dictionary with indexs for each element"""
     output = {}
@@ -48,6 +122,7 @@ def input_sodoku():
             i += 1
         j += 1
     print(output)
+
 
 def given_sudoku():
     """a given sudoku for testing purposes"""
@@ -75,6 +150,7 @@ def given_sudoku():
             j += 1
     return output
 
+
 def check_cols(sudoku):
     """Iterates through the columns of the sudoku
     and eliminates the options if the number appears in the column"""
@@ -99,6 +175,7 @@ def check_cols(sudoku):
         col = set()
         i += 1
     return sudoku
+
 
 def check_rows(sudoku):
     """Iterates through the rows and removes possiblies if the number appears in the row"""
@@ -125,6 +202,7 @@ def check_rows(sudoku):
         j += 1
     return sudoku
 
+
 def get_boxes(su, box_index_dict):
     """This was the easist way to retrieve the values for the boxes"""
     boxes = []
@@ -134,6 +212,7 @@ def get_boxes(su, box_index_dict):
             box.append(su[index])
         boxes.append(box)
     return boxes
+
 
 def check_boxes(sudoku, boxes, box_index_dict):
     """iterates through the boxes, this needs polishing up because its uses the box dict which is a lot cleaner
@@ -155,6 +234,7 @@ def check_boxes(sudoku, boxes, box_index_dict):
                 sudoku[value] = new
     return sudoku
 
+
 def set_length_one(sudoku):
     """if there is only one possible number for a certain index then it updates it to an interger and
     notifies main that the sudoku has been updated with a new number solved"""
@@ -163,12 +243,13 @@ def set_length_one(sudoku):
         if type(sudoku[index]) == set:
             if len(sudoku[index]) == 1:
                 element = list(sudoku[index])[0]
-                #print("Solved position {0} = {1}".format(index,element))
+                print("Solved position {0} = {1}".format(index,element))
                 sudoku_updated = True
 
                 sudoku[index] = element
 
     return sudoku, sudoku_updated
+
 
 def print_sudoku(sudoku):
     """Prints the sudoku in a readable manner"""
@@ -182,6 +263,14 @@ def print_sudoku(sudoku):
             line = []
         else:
             count += 1
+
+
+
+def main():
+    """the main for sudoku solver"""
+    window = Tk()
+    sudoku_solver = SudokuGui(window)
+    window.mainloop()
 
 
 main()
